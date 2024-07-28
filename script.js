@@ -19,8 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (e) => {
                 const img = document.createElement('img');
                 img.src = e.target.result;
+                img.classList.add('draggable');
                 img.dataset.index = imageContainer.childElementCount;
+                img.draggable = true;
                 img.addEventListener('click', () => selectImage(img));
+                img.addEventListener('dragstart', dragStart);
+                img.addEventListener('dragover', dragOver);
+                img.addEventListener('drop', drop);
+                img.addEventListener('dragend', dragEnd);
+                img.addEventListener('dragleave', dragLeave);
                 imageContainer.appendChild(img);
             };
             reader.readAsDataURL(file);
@@ -52,4 +59,37 @@ document.addEventListener('DOMContentLoaded', () => {
         image1.src = '';
         image2.src = '';
     });
+
+    function dragStart(e) {
+        e.target.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', e.target.dataset.index);
+    }
+
+    function dragOver(e) {
+        e.preventDefault();
+        e.target.classList.add('drag-over');
+    }
+
+    function drop(e) {
+        e.preventDefault();
+        const draggingElement = document.querySelector('.dragging');
+        e.target.classList.remove('drag-over');
+        if (e.target.classList.contains('draggable')) {
+            const elements = [...imageContainer.children];
+            const currentIndex = elements.indexOf(e.target);
+            const draggingIndex = elements.indexOf(draggingElement);
+
+            if (currentIndex !== draggingIndex) {
+                imageContainer.insertBefore(draggingElement, draggingIndex < currentIndex ? e.target.nextSibling : e.target);
+            }
+        }
+    }
+
+    function dragLeave(e) {
+        e.target.classList.remove('drag-over');
+    }
+
+    function dragEnd(e) {
+        e.target.classList.remove('dragging');
+    }
 });
