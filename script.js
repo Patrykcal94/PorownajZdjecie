@@ -25,7 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.classList.add('draggable');
                 img.dataset.index = imageContainer.childElementCount;
                 img.draggable = true;
-                img.addEventListener('click', () => selectImage(img));
+                img.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    selectImage(img);
+                });
                 addDragAndDropEvents(img);
                 imageContainer.appendChild(img);
             };
